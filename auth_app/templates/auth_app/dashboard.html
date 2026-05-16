@@ -1,0 +1,6 @@
+{% extends "auth_app/base.html" %}
+
+{% block body %}
+<h4>You have accessed a protected page!</h4>
+<a href="{% url 'auth_app:index' %}">Home</a>
+{% endblock  %}

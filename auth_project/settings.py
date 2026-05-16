@@ -40,6 +40,20 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
+#tell django to use a CustomUserModel - mine
+
+AUTH_USER_MODEL = 'auth_app.CustomUser'  # Format: 'app_name.ModelName'
+
+# tell django how to authenticate the user - mine
+
+AUTHENTICATION_BACKENDS = [
+   'auth_app.backends.CustomAuthBackend' # my custom backend
+]
+
+# next url path - mine
+LOGIN_URL = '/auth_app/login/'
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -98,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
 
 
 # Internationalization
