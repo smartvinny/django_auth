@@ -4,6 +4,7 @@ from .models import Profile, CustomUser
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db import IntegrityError
 
 
 
@@ -24,7 +25,7 @@ def login_view(request):
     if user is not None:
       login(request, user)
       next_url = request.POST.get('next') or request.GET.get('next') 
-      messages.success(request, "user login successfully")
+      messages.success(request, "user logged in successfully")
       return redirect(next_url or "auth_app:index")
     messages.error(request, "your credentials does not match")    
   return render(request, "auth_app/login.html") 
@@ -33,6 +34,7 @@ def login_view(request):
 # custom logout
 def logout_view(request):
   logout(request)
+  messages.success(request, "You have successfuly logged out")
   return redirect("auth_app:login")
 
 # protected page
@@ -48,22 +50,29 @@ def register_view(request):
       username = form.cleaned_data["username"]
       email = form.cleaned_data["email"]
       password = form.cleaned_data["password"]
-      phone = form.cleaned_data["phone"]  
-      new_user = CustomUser.objects.create_user(      
-        username = username,
-        email = email,
-        password = password        
-      )
-      Profile.objects.create(user = new_user, phone_number = phone)
-      return redirect("auth_app:login")
-    else:
+      phone = form.cleaned_data["phone"] 
+      try: 
+        new_user = CustomUser.objects.create_user(      
+          username = username,
+          email = email,
+          password = password        
+        )
+        Profile.objects.create(user = new_user, phone_number = phone)
+        messages.success(request, "You have successfuly registered")
+        return redirect("auth_app:login")
+      
+      except IntegrityError:
+       messages.error(request, "Username or Email already exists")
        return render(request, "auth_app/signup.html", {
         "form": form
-       })   
-  else:
-    form =  SignUpForm()
-  
+       })    
+
     return render(request, "auth_app/signup.html", {
+        "form": form})
+       
+  
+  form =  SignUpForm()  
+  return render(request, "auth_app/signup.html", {
     "form": form
   })
  
